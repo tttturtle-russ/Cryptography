@@ -1,0 +1,3 @@
+/home/russ/CWorkspace/Cryptography/cmake-build-debug/CMakeFiles/Cryptography.dir
+/home/russ/CWorkspace/Cryptography/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/russ/CWorkspace/Cryptography/cmake-build-debug/CMakeFiles/rebuild_cache.dir
