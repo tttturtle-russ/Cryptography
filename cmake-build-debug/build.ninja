@@ -49,8 +49,8 @@ cmake_ninja_workdir = /home/russ/CWorkspace/Cryptography/cmake-build-debug/
 
 build cmake_object_order_depends_target_Cryptography: phony || CMakeFiles/Cryptography.dir
 
-build CMakeFiles/Cryptography.dir/spn.c.o: C_COMPILER__Cryptography_unscanned_Debug /home/russ/CWorkspace/Cryptography/spn.c || cmake_object_order_depends_target_Cryptography
-  DEP_FILE = CMakeFiles/Cryptography.dir/spn.c.o.d
+build CMakeFiles/Cryptography.dir/test.c.o: C_COMPILER__Cryptography_unscanned_Debug /home/russ/CWorkspace/Cryptography/test.c || cmake_object_order_depends_target_Cryptography
+  DEP_FILE = CMakeFiles/Cryptography.dir/test.c.o.d
   FLAGS = -g -std=gnu99 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles/Cryptography.dir
   OBJECT_FILE_DIR = CMakeFiles/Cryptography.dir
@@ -63,7 +63,7 @@ build CMakeFiles/Cryptography.dir/spn.c.o: C_COMPILER__Cryptography_unscanned_De
 #############################################
 # Link the executable Cryptography
 
-build Cryptography: C_EXECUTABLE_LINKER__Cryptography_Debug CMakeFiles/Cryptography.dir/spn.c.o
+build Cryptography: C_EXECUTABLE_LINKER__Cryptography_Debug CMakeFiles/Cryptography.dir/test.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/Cryptography.dir
   POST_BUILD = :
