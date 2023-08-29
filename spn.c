@@ -72,6 +72,8 @@ spn fast_read(){
     return result;
 }
 
+u16 sp[65536];
+u16 inv_sp[65535];
 inline void s_change(u16 u,u16* v){
     u16 tmp_v = 0;
     for (int i = 0; i < 4; ++i){
@@ -105,24 +107,38 @@ inline void p_change(u16 v,u16* w){
     *w = tmp_w;
 }
 
-u16 buf[2000000];
+int read() {
+    char ch = getchar(); int x = 0, f = 1;
+    while(ch < '0' || ch > '9') {
+        if(ch == '-') f = -1;
+        ch = getchar();
+    }
+    while('0' <= ch && ch <= '9') {
+        x = x * 10 + ch - '0';
+        ch = getchar();
+    } return x * f;
+}
+
+void init(){
+    for (int u = 0; u < 65536; ++u){
+        u16 tmp_v = 0,tmp_w = 0;
+        s_change(u,&tmp_v);
+        p_change(tmp_v,&tmp_w);
+        sp[u] = tmp_w;
+        inv_sp[tmp_w] = u;
+    }
+}
 
 int main() {
-    setbuf(stdout,buf);
+    init();
     // 读入第一行
-    char str[1000000];
-    u32 n ;
-    scanf("%s",str);
-    // 读掉换行符
-    getchar();
-    n = strtoul(str,NULL,10);
+    int n = read();
     u16 a1[n],a2[n];
     u32 key;
     u16 plain;
     spn data;
     for (int i = 0; i < n; ++i){
         // 读入16进制字符串
-        //scanf("%x %hx",&key,&plain);
         data = fast_read();
         plain = data.plain;
         key = data.key;
@@ -131,10 +147,17 @@ int main() {
         // 加密过程
         for (int j = 0; j < 4; ++j){
             u = w ^ (key & (0xffff0000 >> (4 * j))) >> (4 * (4 - j));
-            s_change(u,&v);
-            p_change(v,&w);
+//            s_change(u,&v);
+//            p_change(v,&w);
+            w = sp[u];
         }
+        s_change(u,&v);
         u16 y = v ^ (key & 0x0000ffff);
+        for (int j = 3; j >= 0; j--) {
+            u8 c = (y >> (j * 4)) & 0xf;
+            putchar(c < 10 ? c + '0' : c - 10 + 'a');
+        }
+        putchar(' ');
         a1[i] = y;
         // 最后一bit取反
         y ^= 1;
@@ -143,27 +166,15 @@ int main() {
         inv_s_change(v,&u);
         for (int j = 1; j < 5; ++j){
             w = u ^ ((key & (0xffff << (4 * j))) >> (4 * j));
-            p_change(w,&v);
-            inv_s_change(v,&u);
+//            p_change(w,&v);
+//            inv_s_change(v,&u);
+            u = inv_sp[w];
         }
         a2[i] = w;
-    }
-    for (int i = 0; i < n; ++i)
-    {
         for (int j = 3; j >= 0; j--) {
-            unsigned char c = (a1[i] >> (j * 4)) & 0xf;
-            putchar(c < 10 ? c + '0' : c - 10 + 'a');
-        }
-//        putchar((a1[i] >> 8));
-//        putchar(a1[i] != 0);
-        putchar(' ');
-        for (int j = 3; j >= 0; j--) {
-            unsigned char c = (a2[i] >> (j * 4)) & 0xf;
+            u8 c = (w >> (j * 4)) & 0xf;
             putchar(c < 10 ? c + '0' : c - 10 + 'a');
         }
         putchar('\n');
-//        putchar(a2[i] >> 8);
-//        putchar(a2[i] != 0);
     }
-        //        printf("%04x %04x\n",a1[i],a2[i]);
 }
