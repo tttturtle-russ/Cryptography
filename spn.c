@@ -4,42 +4,10 @@
  */
 #pragma GCC optimize(3,"Ofast","inline")
 #include <stdio.h>
-#include <stdlib.h>
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef unsigned long long u64;
+#include "Cryptography.h"
 
-#define MAX_BUFSIZE (1 << 22)
-char _b[MAX_BUFSIZE],*_b1 = NULL,*_b2 = NULL;
-//读一个字符
-#define getch() (_b1==_b2?_b2=_b+fread(_b,1,MAX_BUFSIZE,stdin),_b1=_b,*(_b1++):*(_b1++))
-
-// 正向S盒
-u8 s_box[16] = {
-        0x0e, 0x04, 0x0d, 0x01,
-        0x02, 0x0f, 0x0b, 0x08,
-        0x03, 0x0a, 0x06, 0x0c,
-        0x05, 0x09, 0x00, 0x07
-};
-
-// 逆向S盒
-u8 s_box_inv[16] = {
-        0x0e,0x03,0x04,0x08,
-        0x01,0x0c,0x0a,0x0f,
-        0x07,0x0d,0x09,0x06,
-        0x0b,0x02,0x00,0x05
-};
-
-
-// 正向(逆向)P盒
-u8 p_box[16] = {
-        1,5,9,13,
-        2,6,10,14,
-        3,7,11,15,
-        4,8,12,16
-};
-
+u16 sp[65536];
+u16 inv_sp[65535];
 typedef struct spn{
     u32 key;
     u16 plain;
@@ -72,8 +40,6 @@ spn fast_read(){
     return result;
 }
 
-u16 sp[65536];
-u16 inv_sp[65535];
 inline void s_change(u16 u,u16* v){
     u16 tmp_v = 0;
     for (int i = 0; i < 4; ++i){
@@ -107,17 +73,6 @@ inline void p_change(u16 v,u16* w){
     *w = tmp_w;
 }
 
-int read() {
-    char ch = getchar(); int x = 0, f = 1;
-    while(ch < '0' || ch > '9') {
-        if(ch == '-') f = -1;
-        ch = getchar();
-    }
-    while('0' <= ch && ch <= '9') {
-        x = x * 10 + ch - '0';
-        ch = getchar();
-    } return x * f;
-}
 
 void init(){
     for (int u = 0; u < 65536; ++u){
