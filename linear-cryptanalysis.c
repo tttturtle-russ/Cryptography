@@ -2,8 +2,8 @@
 // Created by russ on 8/29/23.
 //
 #pragma GCC optimize(3,"Ofast","inline")
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -37,6 +37,16 @@ u8 p_box[16] = {
 
 u16 sp[65536];
 u16 inv_sp[65536];
+
+static inline u16 readn(){
+    char ch;
+    u16 n = 0;
+    while ((ch = getchar()) != '\n'){
+        n *= 10;
+        n += ch - '0';
+    }
+    return n;
+}
 
 static inline u16 read(){
     char ch;
@@ -101,7 +111,7 @@ static void init(){
     }
 }
 
-bool spn(u16 x,u16 y ) {
+static inline bool spn(u16 x,u16 y ) {
     u16 u,v,w = x;
     for (int i = 0; i < 4; ++i){
         u = w ^ (key & (0xffff0000 >> (4 * i))) >> (4 * (4 - i));
@@ -114,8 +124,7 @@ bool spn(u16 x,u16 y ) {
 
 int main() {
     init();
-    int n;
-    scanf("%d", &n);
+    int n = readn();
     u16 plain[8000], cipher[8000];
     for (int j = 0; j < n; ++j) {
         bool has_found = false;
@@ -145,20 +154,23 @@ int main() {
             }
         }
 
-         for(int L1 = 0; L1 < 16; ++L1){
-             for(int L2 = 0; L2 < 16; ++L2){
-                 key24_cnt[L1][L2] = abs(key24_cnt[L1][L2] - 4000);
-             }
-         }
+//        for(int L1 = 0; L1 < 16; ++L1){
+//            for(int L2 = 0; L2 < 16; ++L2){
+//                key24_cnt[L1][L2] = abs(key24_cnt[L1][L2] - 4000);
+//            }
+//        }
 
         for (int i = 0; i < 64; ++i){
             int max = -1;
-            key2 = 0;
-            key4 = 0;
+            key2 = -1;
+            key4 = -1;
             for (u8 l1 = 0; l1 < 16; ++l1) {
                 for (u8 l2 = 0; l2 < 16; ++l2) {
-                    if (key24_cnt[l1][l2] > max) {
-                        max = key24_cnt[l1][l2];
+                    if (key24_cnt[l1][l2] == 0)
+                        continue;
+                    int num = abs(key24_cnt[l1][l2] - 4000);
+                    if (num > max) {
+                        max = num;
                         key2 = l1;
                         key4 = l2;
                     }
@@ -206,19 +218,19 @@ int main() {
                     }
                 }
             }
-             for (u8 l1 = 0; l1 < 16; ++l1) {
-                 for (u8 l2 = 0; l2 < 16; ++l2) {
-                     key13_cnt[0][l1][l2] = abs(key13_cnt[0][l1][l2] - 4000);
-                     key13_cnt[1][l1][l2] = abs(key13_cnt[1][l1][l2] - 4000);
-                     key13_total_cnt[l1][l2] = key13_cnt[0][l1][l2] + key13_cnt[1][l1][l2];
-                 }
-             }
+            for (u8 l1 = 0; l1 < 16; ++l1) {
+                for (u8 l2 = 0; l2 < 16; ++l2) {
+                    key13_cnt[0][l1][l2] = abs(key13_cnt[0][l1][l2] - 4000);
+                    key13_cnt[1][l1][l2] = abs(key13_cnt[1][l1][l2] - 4000);
+                    key13_total_cnt[l1][l2] = key13_cnt[0][l1][l2] + key13_cnt[1][l1][l2];
+                }
+            }
             for (int i = 0; i < 2; ++i){
                 max = -1;
                 for (u8 l1 = 0; l1 < 16; ++l1) {
                     for (u8 l2 = 0; l2 < 16; ++l2) {
-                        if (key13_total_cnt[l1][l2] > max) {
-                            max = key13_total_cnt[l1][l2];
+                        if (key24_cnt[l1][l2] > max) {
+                            max = key24_cnt[l1][l2];
                             key1 = l1;
                             key3 = l2;
                         }
@@ -227,7 +239,7 @@ int main() {
                 key13_total_cnt[key1][key3] = 0;
                 u16 tail = (key1 << 12) | (key2 << 8) | (key3 << 4) | key4;
                 // 穷举
-                for (int j = 0; j < 0x10000; ++j){
+                for (int j = 65536; j >= 0; --j){
                     key = (j << 16) | tail;
                     int count = 0;
                     for (; count < 4;count++){
@@ -246,7 +258,7 @@ int main() {
                 break;
         }
         for (int i = 0; i < 8; ++i){
-            char c = (key & (0xf0000000 >> (4 * i))) >> (4 * (7 - i));
+            char c = (key >> (28 - 4 * i)) & 0xf;
             if (c <= 9)
                 putchar(c + '0');
             else
